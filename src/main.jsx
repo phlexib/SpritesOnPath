@@ -1,11 +1,10 @@
 /* jshint ignore:start */
-//#include "./lib/ui.jsx"
 #include "./components/SpritesOnPath.jsx"
 /* jshint ignore:end */
 
 var spritesToUI = (function(thisObj) {
+
   /// Globals Variables
-  var SCRIPTVERSION = "1.0.0";
   var spritesArray = [];
   var MASTER = {
     "comp":"",
@@ -30,7 +29,7 @@ var spritesToUI = (function(thisObj) {
   var titleGrp = win.add("group", [0, 0, 300, 20]);
   titleGrp.orientation = "row";
   titleGrp.alignment = "left";
-  var title = titleGrp.add("statictext", [0, 10, 50, 20], "v" + SCRIPTVERSION);
+  var title = titleGrp.add("statictext", [0, 10, 50, 20], "v" + "@@version");
 
   // SHAPE GRP
   var shapeSetup = win.add("panel", [10, 10, 215, 90], "Shape Setup");
@@ -49,8 +48,8 @@ var spritesToUI = (function(thisObj) {
     { multiline: true }
   );
   var spriteNumberGrp = shapeSetup.add("group", [0, 0, 300, 100], "undefined");
-  var spriteNumberLabel = spriteNumberGrp.add("statictext", [10, 40, 90, 60], "Number of Sprites : ");
-  var spriteNumber = spriteNumberGrp.add("editText", [100, 40, 200, 60],"10",
+  var spriteNumberLabel = spriteNumberGrp.add("statictext", [10, 40, 120, 60], "Number of Sprites : ");
+  var spriteNumber = spriteNumberGrp.add("editText", [100, 40, 160, 60],"10",
     { multiline: false }
   );
 

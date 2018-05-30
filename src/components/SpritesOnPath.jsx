@@ -101,7 +101,7 @@ var SpritesOnPath = (function() {
       });
       newSprite.position.expression = buildOneDExpression(p).positionExpression;
       newSprite.rotation.expression = buildOneDExpression(p).rotationExpression;
-      // newSprite.scale.expression = buildTwoDExpression(p).scaleExpression;
+      newSprite.scale.expression = buildTwoDExpression(p).scaleExpression;
       newSprite.name = "sprite_" + n.toString();
       newSprite.label = 10;
     }

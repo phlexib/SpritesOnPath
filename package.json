@@ -1,5 +1,5 @@
 {
-  "name": "ae-boilerplate",
+  "name": "sprites-on-path",
   "version": "1.0.0",
   "description": "boiler plate for ae dev with gulp and jshint",
   "main": "src/main.js",
@@ -15,7 +15,7 @@
   "homepage": "http://benrohel.com",
   "dependencies": {
     "del": "^2.2.2",
-    "gulp": "^4.0.0",
+    "gulp": "^3.9.1",
     "gulp-header": "^1.8.8",
     "gulp-include": "^2.3.1",
     "gulp-jshint": "^2.0.4",
@@ -24,6 +24,6 @@
     "jshint": "^2.9.5"
   },
   "com_benrohel": {
-    "name": "template"
+    "name": "sprites-on-path"
   }
 }

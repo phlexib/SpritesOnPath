@@ -42,7 +42,7 @@ gulp.task("buildMyScript", ["preprocessSources"], function(){
   return gulp.src(".temp/main.jsx")
     .pipe(include())
     .pipe(header(headerTemplate,{pkg:pkg}))
-    .pipe(rename(".temp/"+ pkg.name+".jsx"))
+    .pipe(rename(pkg.name+".jsx"))
     .pipe(gulp.dest("dist"));
   });
 
