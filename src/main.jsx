@@ -20,63 +20,60 @@ var spritesToUI = (function(thisObj) {
   ///// START UI
   var win = buildUI(thisObj);
   function buildUI(thisObj) {
-    var pal =
-      thisObj instanceof Panel
-        ? thisObj
-        : new Window("palette", "@@name @@version", undefined, {
+    var pal = thisObj instanceof Panel? thisObj : new Window("palette", "@@name @@version", undefined, {
             resizeable: true
           });
     return pal;
   }
 
   ///// TITLE GRP
-  titleGrp = win.add("group", [0, 0, 300, 20]);
+  var titleGrp = win.add("group", [0, 0, 300, 20]);
   titleGrp.orientation = "row";
   titleGrp.alignment = "left";
-  title = titleGrp.add("statictext", [0, 10, 50, 20], "v" + SCRIPTVERSION);
+  var title = titleGrp.add("statictext", [0, 10, 50, 20], "v" + SCRIPTVERSION);
 
   // SHAPE GRP
-  shapeSetup = win.add("panel", [10, 10, 215, 90], "Shape Setup");
-  shapeGrp = shapeSetup.add("group", [0, 0, 300, 100], "undefined");
-  shapeBtn = shapeGrp.add("button", [10, 10, 90, 30], "Set Path");
+  var shapeSetup = win.add("panel", [10, 10, 215, 90], "Shape Setup");
+  var shapeGrp = shapeSetup.add("group", [0, 0, 300, 100], "undefined");
+  var shapeBtn = shapeGrp.add("button", [10, 10, 90, 30], "Set Path");
   var pathName = shapeGrp.add("statictext", [100, 10, 200, 30], "path name", {
     multiline: true
   });
 
-  spriteGrp = shapeSetup.add("group", [0, 0, 300, 100], "undefined");
-  spriteBtn = spriteGrp.add("button", [10, 40, 90, 60], "Set Sprite");
+  var spriteGrp = shapeSetup.add("group", [0, 0, 300, 100], "undefined");
+  var spriteBtn = spriteGrp.add("button", [10, 40, 90, 60], "Set Sprite");
   var selectedSprite = spriteGrp.add(
     "statictext",
     [100, 40, 200, 60],
     "statictext",
     { multiline: true }
   );
-  spriteNumberGrp = shapeSetup.add("group", [0, 0, 300, 100], "undefined");
-  spriteNumberLabel = spriteNumberGrp.add("statictext", [10, 40, 90, 60], "Number of Sprites : ");
+  var spriteNumberGrp = shapeSetup.add("group", [0, 0, 300, 100], "undefined");
+  var spriteNumberLabel = spriteNumberGrp.add("statictext", [10, 40, 90, 60], "Number of Sprites : ");
   var spriteNumber = spriteNumberGrp.add("editText", [100, 40, 200, 60],"10",
     { multiline: false }
   );
 
   // OPTIONS
-  optionsPanel = win.add("panel", [10, 100, 215, 200], "options");
+  var optionsPanel = win.add("panel", [10, 100, 215, 200], "options");
   optionsPanel.alignment = "column";
   optionsPanel.alignChildren = "left";
-  orientationGrp = optionsPanel.add("group", [5, 5, 285, 55], "undefined");
+  var orientationGrp = optionsPanel.add("group", [5, 5, 285, 55], "undefined");
   orientationGrp.alignment = "row";
   orientationGrp.alignChildren = "left";
-  radioTangent = orientationGrp.add("radiobutton", [10, 10, 100, 30], "tangential");
+  var radioTangent = orientationGrp.add("radiobutton", [10, 10, 100, 30], "tangential");
   radioTangent.value = 1;
-  radioPerpendicular = orientationGrp.add(
+  var radioPerpendicular = orientationGrp.add(
     "radiobutton",
     [100, 10, 190, 30],
     "perpendicular"
   );
-  stepBox = optionsPanel.add("checkbox", [10, 30, 80, 50], "stepped");
+  var stepBox = optionsPanel.add("checkbox", [10, 30, 80, 50], "stepped");
   stepBox.value = 0;
-  loopBox = optionsPanel.add("checkbox", [10, 50, 80, 70], "looped");
+  var loopBox = optionsPanel.add("checkbox", [10, 50, 80, 70], "looped");
   loopBox.value = 0;
-  applyGrp = win.add("group", [0, 5, 240, 305], "undefined");
-  applyBtn = applyGrp.add("button", [10, 200, 215, 220], "CREATE SPRITES");
+  var applyGrp = win.add("group", [0, 5, 240, 305], "undefined");
+  var applyBtn = applyGrp.add("button", [10, 200, 215, 220], "CREATE SPRITES");
 
   shapeBtn.onClick = function() {
     pathName.text = setPath();
@@ -92,7 +89,7 @@ var spritesToUI = (function(thisObj) {
       }
       else{
 
-       alert("Select a footage or Comp to use as Sprite.")
+       alert("Select a footage or Comp to use as Sprite.");
       }
 
   };
@@ -167,7 +164,7 @@ var spritesToUI = (function(thisObj) {
   function setSpriteNumber(){
     var spritesNumber = parseInt(spriteNumber.text);
     if(!spriteNumber){
-        alert("Number of Sprites is incorrect.")
+        alert("Number of Sprites is incorrect.");
     }else{
       MASTER.numberOfSprites = spritesNumber;
   }
@@ -190,9 +187,7 @@ function setLoopProperty(){
     setStepProperty();
     setLoopProperty();
     setTangentProperty();
-    SpritesOnPath.buildSprites(MASTER);
-    
-
+    SpritesOnPath.buildSprites(MASTER);   
   }
   
   //// UTILS
@@ -213,5 +208,5 @@ function setLoopProperty(){
   return {
     setSprite:setSprite,
     setPath:setPath
-}
+};
 })(this);

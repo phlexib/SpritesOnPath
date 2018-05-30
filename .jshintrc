@@ -1,13 +1,19 @@
 {
   "undef": true,
   "unused": false,
+  "node":true,
+  "laxbreak": true,
+  "multistr":true,
+  "expr":true,
   "globals": {
     "alert": true,
     "Panel": true,
     "Window": true,
     "File":true,
     "app":true,
-    "@": true
-  },
-  "esversion": 6
+    "@": true,
+    "CompItem":true,
+    "ShapeLayer":true,
+    "SpritesOnPath":true
+  }
 }

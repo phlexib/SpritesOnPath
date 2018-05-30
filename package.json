@@ -12,21 +12,18 @@
   },
   "author": "Ben Rohel",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/benrohel/ae-boilerplate#readme",
+  "homepage": "http://benrohel.com",
   "dependencies": {
     "del": "^2.2.2",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.0",
     "gulp-header": "^1.8.8",
     "gulp-include": "^2.3.1",
     "gulp-jshint": "^2.0.4",
+    "gulp-rename": "^1.2.3",
     "gulp-replace": "^0.5.4",
-    "jshint": "^2.9.4"
+    "jshint": "^2.9.5"
   },
-  "homepage": "http://benrohel.com",
   "com_benrohel": {
     "name": "template"
-  },
-  "devDependencies": {
-    "gulp": "^3.9.1"
   }
 }

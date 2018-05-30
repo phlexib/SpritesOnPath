@@ -1,3 +1,5 @@
+ /*jshint esversion: 6 */
+
 const gulp = require('gulp');
 const replace = require('gulp-replace');
 const include = require('gulp-include');
@@ -6,6 +8,7 @@ const del = require('del');
 const exec = require('child_process').exec;
 const path = require('path');
 const jshint = require('gulp-jshint');
+const rename = require('gulp-rename');
 
 var pkg = require('./package.json');
 var headerTemplate =
@@ -39,7 +42,8 @@ gulp.task("buildMyScript", ["preprocessSources"], function(){
   return gulp.src(".temp/main.jsx")
     .pipe(include())
     .pipe(header(headerTemplate,{pkg:pkg}))
-    .pipe(gulp.dest("dist"))
+    .pipe(rename(".temp/"+ pkg.name+".jsx"))
+    .pipe(gulp.dest("dist"));
   });
 
 
