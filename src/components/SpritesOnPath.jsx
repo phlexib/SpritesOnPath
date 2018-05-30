@@ -1,7 +1,7 @@
 var SpritesOnPath = (function() {
   function buildSprites(master) {
     var targetComp = master.comp;
-    var sprite = master.sprite;
+    var sprites = master.sprite;
     var pointPath = getPathPoints(master.path);
     var numberOfSprites = master.numberOfSprites;
     var refLayer = master.layer;
@@ -11,7 +11,8 @@ var SpritesOnPath = (function() {
     setMasterTangent();
 
     for (var n = 0; n < numberOfSprites; n++) {
-      addSpriteToPoint(n * space);
+      var numSprites = sprites.length;
+      addSpriteToPath(n * space, sprites[n%numSprites]);
     }
 
     function setMasterTangent() {
@@ -76,27 +77,22 @@ var SpritesOnPath = (function() {
 
     function buildTwoDExpression(p) {
       var multiplier = 1;
-      master.isStepped ? (multiplier = Math.ceil(p * 10)) : (multiplier = 1);
+      master.isStepped ? (multiplier = Math.ceil(p * numberOfSprites)/2) : (multiplier = 1);
 
-      var twoDExpression =
-        'var srcLayer = thisComp.layer("' +refLayer.name +'");\
-      var globalOffset = srcLayer.effect("rotationOffset")("Angle");\
-      var globalPositionOffset = srcLayer.effect("positionOffset")("Slider");\
+      var scaleExpression =
+      'var srcLayer = thisComp.layer("' +refLayer.name +'");\
+      var globalScale = srcLayer.effect("spriteScale")("Slider");\
       var globalMultiplier = srcLayer.effect("stepMultiplier")("Slider");\
-      var localOffset = effect("rotationOffset")("Angle");\
-      var localPositionOffset = effect("positionOffset")("Slider");\
-      var srcPath = srcLayer ' + propPath +";\
-      var pos = srcPath.tangentOnPath(percentage =" + p +" +globalPositionOffset+localPositionOffset, t = time);\
-      var res = radiansToDegrees(Math.atan2(pos[1],pos[0]));\
-      var x = res * globalMultiplier * " + multiplier + " +localOffset+globalOffset;\
-      [x,x];\
-      ";
+      var res = globalScale * '+ multiplier + ' ;\
+      [res,res];\
+      ';
 
-      return { twoDExpression: twoDExpression };
+      return { scaleExpression : scaleExpression };
     }
 
-    function addSpriteToPoint(p) {
+    function addSpriteToPath(p,sprite) {
       var layers = targetComp.layers;
+     
       var newSprite = layers.add(sprite);
       addLocalProperties(newSprite, {
         position: 0,
@@ -105,6 +101,7 @@ var SpritesOnPath = (function() {
       });
       newSprite.position.expression = buildOneDExpression(p).positionExpression;
       newSprite.rotation.expression = buildOneDExpression(p).rotationExpression;
+      // newSprite.scale.expression = buildTwoDExpression(p).scaleExpression;
       newSprite.name = "sprite_" + n.toString();
       newSprite.label = 10;
     }
@@ -123,6 +120,9 @@ var SpritesOnPath = (function() {
       var stepMultiplier = effectsProperty.addProperty("ADBE Slider Control");
       stepMultiplier.name = "stepMultiplier";
       stepMultiplier.property("Slider").setValue(1);
+      var spriteScale = effectsProperty.addProperty("ADBE Slider Control");
+      spriteScale.name = "spriteScale";
+      spriteScale.property("Slider").setValue(100);
       var start = effectsProperty.addProperty("ADBE Slider Control");
       start.name = "start";
       start.property("Slider").setValue(0);

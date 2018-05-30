@@ -3,9 +3,10 @@
 #include "./components/SpritesOnPath.jsx"
 /* jshint ignore:end */
 
-var SpritesToUI = (function(thisObj) {
+var spritesToUI = (function(thisObj) {
   /// Globals Variables
   var SCRIPTVERSION = "1.0.0";
+  var spritesArray = [];
   var MASTER = {
     "comp":"",
     "layer":"",
@@ -82,16 +83,22 @@ var SpritesToUI = (function(thisObj) {
   };
 
   spriteBtn.onClick = function() {
+    
       setSprite();
-      if(MASTER.sprite){
-        selectedSprite.text = setSprite().name
-      }else{
+      if(MASTER.sprite.length >1){
+        selectedSprite.text = "Multiple Sprites";
+      }else if (MASTER.sprite.length ===1){
+        selectedSprite.text = MASTER.sprite[0].name;
+      }
+      else{
+
        alert("Select a footage or Comp to use as Sprite.")
       }
 
   };
 
   applyBtn.onClick = function() {
+    app.beginUndoGroup("Sprites On Path");
     runSpritesOnPath();
   };
 
@@ -151,10 +158,10 @@ var SpritesToUI = (function(thisObj) {
   function setSprite() {
     for (var i = 1; i <= app.project.numItems; i++) {
       if (app.project.item(i).selected) {
-          MASTER.sprite = app.project.item(i);
-        return MASTER.sprite;
+          spritesArray.push(app.project.item(i));
       }
     }
+    MASTER.sprite = app.project.selection;
   }
 
   function setSpriteNumber(){
@@ -183,12 +190,9 @@ function setLoopProperty(){
     setStepProperty();
     setLoopProperty();
     setTangentProperty();
-
-    app.beginUndoGroup("Sprites On Path");
-
     SpritesOnPath.buildSprites(MASTER);
     
-    app.endUndoGroup();
+
   }
   
   //// UTILS
