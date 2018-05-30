@@ -1,0 +1,5 @@
+"var srcLayer = thisComp.layer(\"Shape Layer 1\");\
+var srcPath = srcLayer(\"Contents\")(\"Shape 1\")(\"Contents\")(\"Path 1\")(\"Path\");\
+var pos = srcPath.tangentOnPath(percentage = 0.55555555555556, t = time);\
+radiansToDegrees(Math.atan2(pos[1],pos[0]))+90;\
+"

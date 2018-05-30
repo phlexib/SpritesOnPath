@@ -1,0 +1,13 @@
+{
+  "undef": true,
+  "unused": false,
+  "globals": {
+    "alert": true,
+    "Panel": true,
+    "Window": true,
+    "File":true,
+    "app":true,
+    "@": true
+  },
+  "esversion": 6
+}
