@@ -13,7 +13,8 @@ var spritesToUI = (function(thisObj) {
     "numberOfSprites":0,
     "isTangent":true,
     "isLooped" : false,
-    "isStepped" : false
+    "isStepped" : false,
+    "isSequential" : true
 };
 
   ///// START UI
@@ -67,6 +68,12 @@ var spritesToUI = (function(thisObj) {
     [100, 10, 190, 30],
     "perpendicular"
   );
+  var sequenceGrp = optionsPanel.add("group", [5, 5, 285, 55], "undefined");
+  sequenceGrp.alignment = "row";
+  sequenceGrp.alignChildren = "left";
+  var radioSequence = sequenceGrp.add("radiobutton", [10, 10, 100, 30], "Sequential");
+  radioSequence.value = 1;
+  var radioRandom = sequenceGrp.add("radiobutton",[100, 10, 190, 30],"Random");
   var stepBox = optionsPanel.add("checkbox", [10, 30, 80, 50], "stepped");
   stepBox.value = 0;
   var loopBox = optionsPanel.add("checkbox", [10, 50, 80, 70], "looped");
@@ -181,11 +188,16 @@ function setLoopProperty(){
     loopBox.value ?  MASTER.isLooped = true :  MASTER.isLooped = false;
 }
 
+function setsequentialProperty(){
+  radioSequence.value ?  MASTER.isSequential = true :  MASTER.isSequential = false;
+}
+
   function runSpritesOnPath (){
     setSpriteNumber();
     setStepProperty();
     setLoopProperty();
     setTangentProperty();
+    setsequentialProperty();
     SpritesOnPath.buildSprites(MASTER);   
   }
   

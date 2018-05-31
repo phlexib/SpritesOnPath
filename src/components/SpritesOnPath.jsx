@@ -7,12 +7,34 @@ var SpritesOnPath = (function() {
     var refLayer = master.layer;
     var space = 1 / (numberOfSprites - 1);
     var propPath = getPropPath(master.path);
-
+   
     setMasterTangent();
+    alert(master.isSequential);
+    switch (master.isSequential) {
+       
+      case true:
+      for (var n = 0; n < numberOfSprites; n++) {
+        var numSprites = sprites.length;
+        addSpriteToPath(n * space, sprites[n % numSprites]); 
+      }
+       
+        break;
+      case false:
+      for (var n = 0; n < numberOfSprites; n++) {
+        var numSprites = sprites.length;
+        addSpriteToPath(n * space, getRandom(sprites)); 
+      }
+        break;
 
-    for (var n = 0; n < numberOfSprites; n++) {
-      var numSprites = sprites.length;
-      addSpriteToPath(n * space, sprites[n%numSprites]);
+      default:
+        break;
+    }
+
+    
+
+    function getRandom(arr){
+      
+      return arr[Math.floor(Math.random() * arr.length)];
     }
 
     function setMasterTangent() {
@@ -43,30 +65,50 @@ var SpritesOnPath = (function() {
 
     function buildOneDExpression(p) {
       var multiplier = 1;
-      var masterOffset =  "("+ p + " + globalPositionOffset + localPositionOffset)"; 
+      var masterOffset =
+        "(" + p + " + globalPositionOffset + localPositionOffset)";
       master.isStepped ? (multiplier = Math.ceil(p * 10)) : (multiplier = 1);
-      master.isLooped ? masterOffset = "("+ p + " + globalPositionOffset + localPositionOffset)%1.00001" : masterOffset = "("+ p + " + globalPositionOffset + localPositionOffset)"; 
+      master.isLooped
+        ? (masterOffset =
+            "(" + p + " + globalPositionOffset + localPositionOffset)%1.00001")
+        : (masterOffset =
+            "(" + p + " + globalPositionOffset + localPositionOffset)");
 
-
-      var positionExpression ='var srcLayer = thisComp.layer("' + refLayer.name +'");\
-      var srcPath = srcLayer ' + propPath +';\
+      var positionExpression =
+        'var srcLayer = thisComp.layer("' +
+        refLayer.name +
+        '");\
+      var srcPath = srcLayer ' +
+        propPath +
+        ';\
       var globalPositionOffset = srcLayer.effect("positionOffset")("Slider");\
       var localPositionOffset = effect("positionOffset")("Slider");\
-      var clamped = linear('+ masterOffset +',0,1,srcLayer.effect("start")("Slider")/100,srcLayer.effect("end")("Slider")/100);\
+      var clamped = linear(' +
+        masterOffset +
+        ',0,1,srcLayer.effect("start")("Slider")/100,srcLayer.effect("end")("Slider")/100);\
       var pos = srcPath.pointOnPath(percentage = clamped + globalPositionOffset +localPositionOffset , t = time);\
       srcLayer.toComp(pos)';
 
-      var rotationExpression ='var srcLayer = thisComp.layer("' +refLayer.name +'");\
+      var rotationExpression =
+        'var srcLayer = thisComp.layer("' +
+        refLayer.name +
+        '");\
       var globalRotationOffset = srcLayer.effect("rotationOffset")("Angle");\
       var globalPositionOffset = srcLayer.effect("positionOffset")("Slider");\
       var globalMultiplier = srcLayer.effect("stepMultiplier")("Slider");\
       var localRotationOffset = effect("rotationOffset")("Angle");\
       var localPositionOffset = effect("positionOffset")("Slider");\
-      var clamped = linear('+ masterOffset +',0,1,srcLayer.effect("start")("Slider")/100,srcLayer.effect("end")("Slider")/100);\
-      var srcPath = srcLayer ' + propPath +";\
+      var clamped = linear(' +
+        masterOffset +
+        ',0,1,srcLayer.effect("start")("Slider")/100,srcLayer.effect("end")("Slider")/100);\
+      var srcPath = srcLayer ' +
+        propPath +
+        ";\
       var pos = srcPath.tangentOnPath(percentage = clamped +globalPositionOffset + localPositionOffset, t = time);\
       var res = radiansToDegrees(Math.atan2(pos[1],pos[0]));\
-      res * globalMultiplier * " + multiplier +" +localRotationOffset+globalRotationOffset;\
+      res * globalMultiplier * " +
+        multiplier +
+        " +localRotationOffset+globalRotationOffset;\
       ";
 
       return {
@@ -77,22 +119,28 @@ var SpritesOnPath = (function() {
 
     function buildTwoDExpression(p) {
       var multiplier = 1;
-      master.isStepped ? (multiplier = Math.ceil(p * numberOfSprites)/2) : (multiplier = 1);
+      master.isStepped
+        ? (multiplier = Math.ceil(p * numberOfSprites) / 2)
+        : (multiplier = 1);
 
       var scaleExpression =
-      'var srcLayer = thisComp.layer("' +refLayer.name +'");\
+        'var srcLayer = thisComp.layer("' +
+        refLayer.name +
+        '");\
       var globalScale = srcLayer.effect("spriteScale")("Slider");\
       var globalMultiplier = srcLayer.effect("stepMultiplier")("Slider");\
-      var res = globalScale * '+ multiplier + ' ;\
+      var res = globalScale * ' +
+        multiplier +
+        " ;\
       [res,res];\
-      ';
+      ";
 
-      return { scaleExpression : scaleExpression };
+      return { scaleExpression: scaleExpression };
     }
 
-    function addSpriteToPath(p,sprite) {
+    function addSpriteToPath(p, sprite) {
       var layers = targetComp.layers;
-     
+
       var newSprite = layers.add(sprite);
       addLocalProperties(newSprite, {
         position: 0,
@@ -156,7 +204,6 @@ var SpritesOnPath = (function() {
   function getPathPoints(path) {
     return path.value.vertices;
   }
-  
 
   return {
     buildSprites: buildSprites
