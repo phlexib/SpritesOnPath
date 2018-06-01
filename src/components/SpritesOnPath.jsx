@@ -9,7 +9,7 @@ var SpritesOnPath = (function() {
     var propPath = getPropPath(master.path);
    
     setMasterTangent();
-    alert(master.isSequential);
+    
     switch (master.isSequential) {
        
       case true:
