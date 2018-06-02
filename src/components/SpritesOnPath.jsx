@@ -33,7 +33,6 @@ var SpritesOnPath = (function() {
     
 
     function getRandom(arr){
-      
       return arr[Math.floor(Math.random() * arr.length)];
     }
 
@@ -188,6 +187,8 @@ var SpritesOnPath = (function() {
     return props;
   }
 
+  
+  
   /* General functions */
 
   function getPropPath(prop) {

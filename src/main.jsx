@@ -1,9 +1,9 @@
 /* jshint ignore:start */
 #include "./components/SpritesOnPath.jsx"
+#include "./components/effectors.jsx"
 /* jshint ignore:end */
 
 var spritesToUI = (function(thisObj) {
-
   /// Globals Variables
   var spritesArray = [];
   var MASTER = {
@@ -84,9 +84,7 @@ var spritesToUI = (function(thisObj) {
   shapeBtn.onClick = function() {
     pathName.text = setPath();
   };
-
   spriteBtn.onClick = function() {
-    
       setSprite();
       if(MASTER.sprite.length >1){
         selectedSprite.text = "Multiple Sprites";
@@ -105,6 +103,27 @@ var spritesToUI = (function(thisObj) {
     runSpritesOnPath();
   };
 
+  // EFFECTOR GRP
+  var effectorSetup = win.add("panel", [10, 10, 215, 90], "Effector");
+  var effectorGrp = effectorSetup.add("group", [0, 0, 300, 100], "undefined");
+  var addEffectorBtn = effectorGrp.add("button", [10, 10, 30, 30], "+");
+  addEffectorBtn.onClick = function() {
+    effectorName.text = setEffector();
+  };
+  var removeEffectorBtn = effectorGrp.add("button", [10, 10, 30, 30], "-");
+  removeEffectorBtn.onClick = function() {
+    alert(this.text)
+  };
+  var effectorName = effectorGrp.add("statictext", [10, 10, 150, 30], "path name", {
+    multiline: true
+  });
+  var addEffectorBtn = effectorGrp.add("button", [10, 10, 30, 30], ">");
+  
+  addEffectorBtn.onClick = function() {
+    alert(this.text)
+  };
+
+
   win.onResizing = win.onResize = function() {
     this.layout.resize();
   };
@@ -122,6 +141,7 @@ var spritesToUI = (function(thisObj) {
     container.layout.layout(true); //Update the container
     win.layout.layout(true); //Then update the main UI layout
   }
+
   win.active = true;
   win.layout.layout(true);
   win.layout.resize();
@@ -138,13 +158,10 @@ var spritesToUI = (function(thisObj) {
     } else {
     MASTER.comp = comp;
       var layer = getSelectedLayers(comp)[0];
-
       if (!(layer instanceof ShapeLayer)) {
         alert("You can only select a Path Property.");
-      } else {
-          
-        MASTER.layer = layer;
-        
+      } else {  
+        MASTER.layer = layer;       
         var shapeProps = getSelectedProperties(layer)[1];
 
         if (shapeProps.matchName != "ADBE Vector Shape") {
@@ -192,15 +209,33 @@ function setsequentialProperty(){
   radioSequence.value ?  MASTER.isSequential = true :  MASTER.isSequential = false;
 }
 
-  function runSpritesOnPath (){
-    setSpriteNumber();
-    setStepProperty();
-    setLoopProperty();
-    setTangentProperty();
-    setsequentialProperty();
-    SpritesOnPath.buildSprites(MASTER);   
+function runSpritesOnPath (){
+  setSpriteNumber();
+  setStepProperty();
+  setLoopProperty();
+  setTangentProperty();
+  setsequentialProperty();
+  SpritesOnPath.buildSprites(MASTER);   
+  Effectors
+}
+
+function setEffector(){
+  var comp = app.project.activeItem;
+  if (!(comp instanceof CompItem)) {
+      alert("Please Select a Comp");
+  } 
+  else {
+    var layer = getSelectedLayers(comp)[0];
+    if (!(layer instanceof ShapeLayer)) {
+      alert("You can only select a Path Property.");
+    } else {  
+      Effectors.createEffector(layer);   
+      return layer.name; 
+    }
   }
-  
+}
+
+
   //// UTILS
 
   function getSelectedLayers(targetComp) {
