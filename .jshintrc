@@ -6,12 +6,14 @@
   "multistr":true,
   "expr":true,
   "globals": {
+    "#include" : true,
     "alert": true,
     "Panel": true,
     "Window": true,
     "File":true,
     "app":true,
     "@": true,
+    ".@":true,
     "CompItem":true,
     "ShapeLayer":true,
     "SpritesOnPath":true

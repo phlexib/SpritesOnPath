@@ -112,17 +112,12 @@ var spritesToUI = (function(thisObj) {
   };
   var removeEffectorBtn = effectorGrp.add("button", [10, 10, 30, 30], "-");
   removeEffectorBtn.onClick = function() {
-    alert(this.text)
+    alert(this.text);
   };
   var effectorName = effectorGrp.add("statictext", [10, 10, 150, 30], "path name", {
     multiline: true
   });
-  var addEffectorBtn = effectorGrp.add("button", [10, 10, 30, 30], ">");
-  
-  addEffectorBtn.onClick = function() {
-    alert(this.text)
-  };
-
+ 
 
   win.onResizing = win.onResize = function() {
     this.layout.resize();
@@ -216,7 +211,6 @@ function runSpritesOnPath (){
   setTangentProperty();
   setsequentialProperty();
   SpritesOnPath.buildSprites(MASTER);   
-  Effectors
 }
 
 function setEffector(){
@@ -229,7 +223,7 @@ function setEffector(){
     if (!(layer instanceof ShapeLayer)) {
       alert("You can only select a Path Property.");
     } else {  
-      Effectors.createEffector(layer);   
+        
       return layer.name; 
     }
   }
