@@ -15,9 +15,6 @@ function getUserDataFolderPath(){
   return Folder.userData.fsName;
 }
 
-
-
-
 function writeFile(presets,filepath){
   // get the text file
   var write_file = File(filepath);
@@ -72,4 +69,4 @@ function appendFile(filepath){
   append_file.close();
   }
 }
-  
+

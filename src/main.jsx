@@ -1,6 +1,6 @@
 /* jshint ignore:start */
-#include "./components/SpritesOnPath.jsx"
-#include "./components/effectors.jsx"
+#include "./components/spritesOnPath.jsx"
+#include "./components/effector.jsx"
 /* jshint ignore:end */
 
 var spritesToUI = (function(thisObj) {
@@ -14,7 +14,8 @@ var spritesToUI = (function(thisObj) {
     "isTangent":true,
     "isLooped" : false,
     "isStepped" : false,
-    "isSequential" : true
+    "isSequential" : true,
+    "effector" : {}
 };
 
   ///// START UI
@@ -36,7 +37,7 @@ var spritesToUI = (function(thisObj) {
   var shapeSetup = win.add("panel", [10, 10, 215, 90], "Shape Setup");
   var shapeGrp = shapeSetup.add("group", [0, 0, 300, 100], "undefined");
   var shapeBtn = shapeGrp.add("button", [10, 10, 90, 30], "Set Path");
-  var pathName = shapeGrp.add("statictext", [100, 10, 200, 30], "path name", {
+  var pathName = shapeGrp.add("statictext", [100, 10, 200, 30], "Select a Path.", {
     multiline: true
   });
 
@@ -45,7 +46,7 @@ var spritesToUI = (function(thisObj) {
   var selectedSprite = spriteGrp.add(
     "statictext",
     [100, 40, 200, 60],
-    "statictext",
+    "Select Sprites.",
     { multiline: true }
   );
   var spriteNumberGrp = shapeSetup.add("group", [0, 0, 300, 100], "undefined");
@@ -105,16 +106,31 @@ var spritesToUI = (function(thisObj) {
 
   // EFFECTOR GRP
   var effectorSetup = win.add("panel", [10, 10, 215, 90], "Effector");
+
   var effectorGrp = effectorSetup.add("group", [0, 0, 300, 100], "undefined");
-  var addEffectorBtn = effectorGrp.add("button", [10, 10, 30, 30], "+");
-  addEffectorBtn.onClick = function() {
+  effectorGrp.alignment = 'left';
+  var setEffectorBtn = effectorGrp.add("button", [10, 10, 90, 30], "Set effector");
+  setEffectorBtn.enabled = false;
+  setEffectorBtn.onClick = function() {
     effectorName.text = setEffector();
   };
-  var removeEffectorBtn = effectorGrp.add("button", [10, 10, 30, 30], "-");
-  removeEffectorBtn.onClick = function() {
+  var effectorName = effectorGrp.add("statictext", [10, 10, 150, 30], "Select a Shape Layer.", {
+    multiline: true
+  });
+  var effectorPropertyGrp = effectorSetup.add("group", [0, 0, 300, 100], "undefined");
+  effectorPropertyGrp.alignment = 'left';
+  effectorPropertyGrp.alignChildren = 'left';
+  var addEffectorPropertyBtn = effectorPropertyGrp.add("button", [10, 10, 30, 30], "+");
+  addEffectorPropertyBtn.enabled = false;
+  addEffectorPropertyBtn.onClick = function() {
+    propertyName.text = setPropertyToEffector();
+  };
+  var removePropertyEffectorBtn = effectorPropertyGrp.add("button", [10, 10, 30, 30], "-");
+  removePropertyEffectorBtn.enabled = false;
+  removePropertyEffectorBtn.onClick = function() {
     alert(this.text);
   };
-  var effectorName = effectorGrp.add("statictext", [10, 10, 150, 30], "path name", {
+  var propertyName = effectorPropertyGrp.add("statictext", [10, 10, 150, 30], "Add a Property.", {
     multiline: true
   });
  
@@ -149,7 +165,7 @@ var spritesToUI = (function(thisObj) {
   function setPath() {
     var comp = app.project.activeItem;
     if (!(comp instanceof CompItem)) {
-      alert("Please Select a Comp");
+      alert("Please Select a Comp");7 
     } else {
     MASTER.comp = comp;
       var layer = getSelectedLayers(comp)[0];
@@ -164,6 +180,8 @@ var spritesToUI = (function(thisObj) {
         } else {
            
           MASTER.path = shapeProps;
+          setEffectorBtn.enabled = true;
+          
           return layer.name;
         }
       }
@@ -222,11 +240,26 @@ function setEffector(){
     var layer = getSelectedLayers(comp)[0];
     if (!(layer instanceof ShapeLayer)) {
       alert("You can only select a Path Property.");
-    } else {  
-        
+    } else { 
+      SpritesOnPath.addPathToComment(MASTER.layer,layer);
+      var effector = new Effector(layer,MASTER.layer,comp);
+      MASTER.effector = effector;
+      addEffectorPropertyBtn.enabled = true;
+      removePropertyEffectorBtn.enabled = true;
       return layer.name; 
     }
   }
+}
+
+function setPropertyToEffector(){
+  var effectorProp =  SpritesOnPath.getSelectedProperties(MASTER.comp.selectedLayers[0])[0];
+  if(effectorProp){
+    return effectorProp.name;
+  }else{
+    alert("Select a Property on a Sprite Layer.")
+    return "Add a Property."
+  }
+  
 }
 
 

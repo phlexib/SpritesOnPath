@@ -3,7 +3,7 @@
 #include "../lib/filePath.jsx"
 /* jshint ignore:end */
 
-function Effector() {
+function Effector(effectorLayer,shape,comp) {
 
   var EFFECTOR_PROP_TYPE = {
     GROUP: {"matchName" : "Group", "name": "",INVISIBLE : false},
@@ -15,13 +15,18 @@ function Effector() {
     POINT:{"matchName" : "Point", "name": "","default_x" : 0.5, "default_y":0.5,"CANNOT_TIME_VARY":false, "INVISIBLE": false},
     SLIDER :{"matchName" : "Slider", "name": "","default" : 0,"valid_min" : -100,"valid_max":100,"slider_min":-100,"slider_max":100,"CANNOT_TIME_VARY":false,"DISPLAY_PERCENT":true, "DISPLAY_PIXEL":false, "INVISIBLE":false},
   };
+
+  this.effectorLayer = effectorLayer;
+  this.comp = comp;
+  this.shape = shape;
   var pseudoGrp;
-  var effLayer;
   var name;
-  var shape;
   var effBox;
   var effProperties;
   
+  function assignPropperties(){
+    forEachLayerInComp(this.comp,checkLayerAsSprite)
+  }
 
   function buildPseudoEffect(effName){
     var eff = new XML('<Effect/>');
@@ -30,7 +35,6 @@ function Effector() {
 
     var child = buildPseudoEffectProperty(EFFECTOR_PROP_TYPE.SLIDER,{"name":"slider Test"});
     eff.appendChild(child);
-    alert(eff.toXMLString())
     return eff;
   }
 
@@ -66,16 +70,23 @@ function Effector() {
 
   function getPseudoXmlFile(){
     var pseudoFile;
+   
     if (OS.isWindows()){
-      pseudoFile = ("/Volumes/Adobe After Effects CC 2018/Adobe\ After\ Effects\ 7.0/Adobe\ After\ Effects\ 7.0.app/Contents/Resources/")
+      pseudoFile = File ("c:\\Program Files\\Adobe\\Adobe After Effects CC 2018\\Support Files\\PresetEffects.xml");
     }else{
       pseudoFile = File ("/Applications/Adobe After Effects CC 2018/Adobe After Effects CC 2018.app/Contents/Resources/PresetEffects.xml");
     }
+
+    var backUpFile = File(pseudoFile.fsName.replace("PresetEffects","PresetEffects_backup"));
+    if(!backUpFile.exists){
+     var backUp = pseudoFile.copy(new File(backUpFile.URI));  
+    };
 
     if(pseudoFile){
       pseudoFile.open("r");  
       var xmlString = pseudoFile.read();  
       var pseudoXml = new XML(xmlString);  
+     
       pseudoFile.close();  
       return {"xml": pseudoXml, "file":pseudoFile};
       } else {  
@@ -115,77 +126,25 @@ function Effector() {
     writeFile(presetFile,filePath);
   }
 
-  // function rectangleCollision(rect1, rect2) {
-  //   if (
-  //     rect1.left < rect2.left + rect2.width &&
-  //     rect1.left + rect1.width > rect2.lft &&
-  //     rect1.top < rect2.top + rect2.height &&
-  //     rect1.height + rect1.top > rect2.top
-  //   ) {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // }
+  function forEachLayerinComp(comp, callback){
+    var compLayers = comp.layers;
+    for (var l=1 ; l<= compLayers.length ; l++){
+      callback(compLayers.layer(l));
+    }
+  }
 
-  // function overlapBoxes (box1,box2){
-  //   var x_overlap = Math.max(0, Math.min(box1.right, box2.right) - Math.max(box1.left, box2.left));
-  //   var y_overlap = Math.max(0, Math.min(box1.bottom, box2.bottom) - Math.max(box1.top, box2.top));
-  //   overlapArea = x_overlap * y_overlap;
-  //   return overlapArea
-  // }
+  function checkLayerAsSprite(layer){
+    if(layer.comment.match(layer.name,g)){
+      return true;
+    }
+  }
 
-  // function effectorExpression(effectorLayer){
-  //   return
-  //   'function makeShapeBox(refLayer){\n
-  //   var rec = refLayer.sourceRectAtTime(time,false);\n
-  //   var recLeft = rec.left + refLayer.position[0] - refLayer.anchorPoint[0];\n
-  //   var recTop = rec.top + refLayer.position[1] - refLayer.anchorPoint[1];\n
-  //   var topLeft = [recLeft,recTop];\n
-  //   var recWidth =rec.width;\n
-  //   var recHeight = rec.height;\n
-  //   var recRight = recLeft + recWidth;\n
-  //   var recBottom = recTop + recHeight\n
-  //   var box = {\n
-  //        "left" : recLeft ,\
-  //        "width" : recWidth,\
-  //        "top":recTop,\
-  //        "height":recHeight,\
-  //        "right" : recRight,\
-  //        "bottom : recBottom,\
-  //       "topLeft" : topLeft\
-  //   };\n
-  //   return box;\n
-  // }\n
-  // \n
-  // function collision(rect1,rect2){\n
-  //   if (rect1.left < rect2.left + rect2.width &&\
-  //   rect1.left + rect1.width > rect2.left &&\
-  //   rect1.top < rect2.top + rect2.height &&\
-  //   rect1.height + rect1.top > rect2.top) {\n
-  //    return "true"\n
-  //    }else{\n
-  //    return "false"\n
-  //    }\n
-  // }\n
-  // \n
-  // var box1 = makeShapeBox(thisComp.layer(\""+Box1+"\"));\n
-  // var box2 = makeShapeBox(thisLayer);\n
-
-  // collision(box1,box2);\n
-  // x_overlap = Math.max(0, Math.min(box1.right, box2.right) - Math.max(box1.left, box2.left));\n
-  // y_overlap = Math.max(0, Math.min(box1.bottom, box2.bottom) - Math.max(box1.top, box2.top));\n
-  // overlapArea = x_overlap * y_overlap;\n
-  // var res = Math.sqrt(overlapArea)\n
-  // linear(parseFloat(res),0,(box1.width*box1.height),100,0)\n
-  // '
-  // }
   this.getPseudoXmlFile = getPseudoXmlFile;
   this.appendPseudoEffectToXml = appendPseudoEffectToXml;
   this.savePresetFile = savePresetFile;
 }
 
-var xml = new Effector();
-var presets = xml.getPseudoXmlFile().xml;
-xml.appendPseudoEffectToXml(presets,"Test");
-xml.savePresetFile(presets.toXMLString(),"/Users/benjamin/Desktop/test.xml");
+// var xml = new Effector();
+// var presets = xml.getPseudoXmlFile().xml;
+// xml.appendPseudoEffectToXml(presets,"Test");
+// xml.savePresetFile(presets.toXMLString(),"~/Desktop/test.xml");

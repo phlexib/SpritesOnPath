@@ -1,5 +1,7 @@
 var SpritesOnPath = (function() {
+
   function buildSprites(master) {
+
     var targetComp = master.comp;
     var sprites = master.sprite;
     var pointPath = getPathPoints(master.path);
@@ -7,7 +9,7 @@ var SpritesOnPath = (function() {
     var refLayer = master.layer;
     var space = 1 / (numberOfSprites - 1);
     var propPath = getPropPath(master.path);
-   
+    var spritesLayer = [];
     setMasterTangent();
     
     switch (master.isSequential) {
@@ -29,8 +31,6 @@ var SpritesOnPath = (function() {
       default:
         break;
     }
-
-    
 
     function getRandom(arr){
       return arr[Math.floor(Math.random() * arr.length)];
@@ -139,7 +139,6 @@ var SpritesOnPath = (function() {
 
     function addSpriteToPath(p, sprite) {
       var layers = targetComp.layers;
-
       var newSprite = layers.add(sprite);
       addLocalProperties(newSprite, {
         position: 0,
@@ -149,9 +148,14 @@ var SpritesOnPath = (function() {
       newSprite.position.expression = buildOneDExpression(p).positionExpression;
       newSprite.rotation.expression = buildOneDExpression(p).rotationExpression;
       newSprite.scale.expression = buildTwoDExpression(p).scaleExpression;
+      newSprite.opacity.expression = effectorExpression("Box1",100,0);
       newSprite.name = "sprite_" + n.toString();
       newSprite.label = 10;
+      addPathToComment(refLayer,newSprite);
+      spritesLayer.push(newSprite);
+     
     }
+    return spritesLayer;
   }
 
   function addLocalProperties(layer, options) {
@@ -187,8 +191,6 @@ var SpritesOnPath = (function() {
     return props;
   }
 
-  
-  
   /* General functions */
 
   function getPropPath(prop) {
@@ -206,7 +208,56 @@ var SpritesOnPath = (function() {
     return path.value.vertices;
   }
 
+
+
+
+function effectorExpression (effectorLayerName,min,max){
+return "function makeShapeBox(refLayer){\n"+
+"var rec = refLayer.sourceRectAtTime(time,false);\n"+
+"var recLeft = rec.left + refLayer.position[0] - refLayer.anchorPoint[0];\n"+
+"var recTop = rec.top + refLayer.position[1] - refLayer.anchorPoint[1];\n"+
+"var topLeft = [recLeft,recTop];\n"+
+"var recWidth = rec.width  * (refLayer.scale[0]/100);\n"+
+"var recHeight = rec.height  * (refLayer.scale[1]/100);\n"+ 
+"var recRight = recLeft + recWidth;\n"+
+"var recBottom = recTop + recHeight;\n"+
+"var box = "+
+"{'left' : recLeft,"+
+"'width' : recWidth,"+
+"'top': recTop,"+
+"'height': recHeight,"+
+"'right' : recRight ,"+
+"'bottom' : recBottom ,"+
+"'topLeft' : topLeft };\n"+
+"  return box;}\n"+
+"\n"+
+"function collision(rect1,rect2){\n"+
+"    if (rect1.left < rect2.left + rect2.width\n"+
+"      && rect1.left + rect1.width > rect2.left\n"+
+"      && rect1.top < rect2.top + rect2.height\n"+
+"      && rect1.height + rect1.top > rect2.top) {\n"+
+" return 'true'; }\n"+
+"  else{\n"+
+"  return 'false';\n"+
+"  };\n"+
+"  };\n"+
+"var box1 = makeShapeBox(thisComp.layer(\""+effectorLayerName+"\"));\n"+
+"var box2 = makeShapeBox(thisLayer);\n"+
+"collision(box1,box2);\n"+
+"x_overlap = Math.max(0, Math.min(box1.right, box2.right) - Math.max(box1.left, box2.left));\n"+
+"y_overlap = Math.max(0, Math.min(box1.bottom, box2.bottom) - Math.max(box1.top, box2.top));\n"+
+"overlapArea = x_overlap * y_overlap;\n"+
+"var res = Math.sqrt(overlapArea);\n"+
+"linear(parseFloat(res),0,box2.width,"+ min + ","+ max +");\n";
+}
+
+function addPathToComment(pathLayer, targetLayer){
+  targetLayer.comment = targetLayer.comment + pathLayer.name + " | ";
+}
+
   return {
-    buildSprites: buildSprites
+    buildSprites: buildSprites,
+    getSelectedProperties : getSelectedProperties,
+    addPathToComment : addPathToComment
   };
 })();
