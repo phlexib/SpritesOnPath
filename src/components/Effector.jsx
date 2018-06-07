@@ -3,6 +3,12 @@
 #include "../lib/filePath.jsx"
 /* jshint ignore:end */
 
+/**
+ * Create a new effector instance
+ * @param {LayerItem} effectorLayer 
+ * @param {LayerItem} shape 
+ * @param {CompItem} comp 
+ */
 function Effector(effectorLayer,shape,comp) {
 
   var EFFECTOR_PROP_TYPE = {
@@ -20,12 +26,26 @@ function Effector(effectorLayer,shape,comp) {
   this.comp = comp;
   this.shape = shape;
   var pseudoGrp;
-  var name;
+  var name = this.effectorLayer.name;
   var effBox;
-  var effProperties;
-  
-  function assignPropperties(){
-    forEachLayerInComp(this.comp,checkLayerAsSprite)
+  var properties = [];
+    
+  function applyPropToSprite(propLayers,effProp){
+    var propertyIndex = effProp.index;
+    var parentMatchName = effProp.matchName;
+    var min = effProp.min;
+    var max = effProp.max;
+
+    properties.push(parentMatchName);
+
+    for(var pl = 0 ; pl< propLayers.length ; pl++){
+      var propLayer = propLayers[pl];
+      var propLayer = propLayers[pl];
+      var effectsProperty = propLayer.property("ADBE Effect Parade");
+      var newProp = effectsProperty.addProperty(parentMatchName);
+      newProp.property(propertyIndex).expression = effectorExpression(min,max);
+      newProp.name += " | " + shape.name; 
+    }
   }
 
   function buildPseudoEffect(effName){
@@ -126,22 +146,63 @@ function Effector(effectorLayer,shape,comp) {
     writeFile(presetFile,filePath);
   }
 
-  function forEachLayerinComp(comp, callback){
-    var compLayers = comp.layers;
-    for (var l=1 ; l<= compLayers.length ; l++){
-      callback(compLayers.layer(l));
-    }
+
+  
+
+
+function effectorExpression (min,max){
+  return "function makeShapeBox(refLayer){\n"+
+  "var rec = refLayer.sourceRectAtTime(time,false);\n"+
+  "var recLeft = rec.left + refLayer.position[0] - refLayer.anchorPoint[0];\n"+
+  "var recTop = rec.top + refLayer.position[1] - refLayer.anchorPoint[1];\n"+
+  "var topLeft = [recLeft,recTop];\n"+
+  "var recWidth = rec.width  * (refLayer.scale[0]/100);\n"+
+  "var recHeight = rec.height  * (refLayer.scale[1]/100);\n"+ 
+  "var recRight = recLeft + recWidth;\n"+
+  "var recBottom = recTop + recHeight;\n"+
+  "var box = "+
+  "{'left' : recLeft,"+
+  "'width' : recWidth,"+
+  "'top': recTop,"+
+  "'height': recHeight,"+
+  "'right' : recRight ,"+
+  "'bottom' : recBottom ,"+
+  "'topLeft' : topLeft };\n"+
+  "  return box;}\n"+
+  "\n"+
+  "function collision(rect1,rect2){\n"+
+  "    if (rect1.left < rect2.left + rect2.width\n"+
+  "      && rect1.left + rect1.width > rect2.left\n"+
+  "      && rect1.top < rect2.top + rect2.height\n"+
+  "      && rect1.height + rect1.top > rect2.top) {\n"+
+  " return 'true'; }\n"+
+  "  else{\n"+
+  "  return 'false';\n"+
+  "  };\n"+
+  "  };\n"+
+  "var box1 = makeShapeBox(thisComp.layer(\""+effectorLayer.name+"\"));\n"+
+  "var box2 = makeShapeBox(thisLayer);\n"+
+  "collision(box1,box2);\n"+
+  "x_overlap = Math.max(0, Math.min(box1.right, box2.right) - Math.max(box1.left, box2.left));\n"+
+  "y_overlap = Math.max(0, Math.min(box1.bottom, box2.bottom) - Math.max(box1.top, box2.top));\n"+
+  "overlapArea = x_overlap * y_overlap;\n"+
+  "var res = Math.sqrt(overlapArea);\n"+
+  "linear(parseFloat(res),0,box2.width,"+ max + ","+ min +");\n";
   }
 
-  function checkLayerAsSprite(layer){
-    if(layer.comment.match(layer.name,g)){
-      return true;
-    }
+  function removeEffProperty(effPropIndex){
+    properties.splice(effPropIndex, 1);
   }
+
+
 
   this.getPseudoXmlFile = getPseudoXmlFile;
   this.appendPseudoEffectToXml = appendPseudoEffectToXml;
   this.savePresetFile = savePresetFile;
+  this.properties = properties;
+  this.name = name;
+  this.applyPropToSprite = applyPropToSprite;   
+  this.removeEffProperty = removeEffProperty
 }
 
 // var xml = new Effector();

@@ -1,6 +1,7 @@
-/* jshint ignore:start */
+﻿/* jshint ignore:start */
 #include "./components/spritesOnPath.jsx"
 #include "./components/effector.jsx"
+#include "./components/effProperty.jsx"
 /* jshint ignore:end */
 
 var spritesToUI = (function(thisObj) {
@@ -9,6 +10,7 @@ var spritesToUI = (function(thisObj) {
   var MASTER = {
     "comp":"",
     "layer":"",
+    "spritesLayers":[],
     "path":"",
     "numberOfSprites":0,
     "isTangent":true,
@@ -33,8 +35,12 @@ var spritesToUI = (function(thisObj) {
   titleGrp.alignment = "left";
   var title = titleGrp.add("statictext", [0, 10, 50, 20], "v" + "@@version");
 
+  //// Tabs
+  var tabPanel =  win.add ("tabbedpanel", [0, 0, 300, 300]);
+  var shapePanel = tabPanel.add("tab",undefined,"Sprites");
+
   // SHAPE GRP
-  var shapeSetup = win.add("panel", [10, 10, 215, 90], "Shape Setup");
+  var shapeSetup = shapePanel.add("panel", [10, 10, 215, 90], "Shape Setup");
   var shapeGrp = shapeSetup.add("group", [0, 0, 300, 100], "undefined");
   var shapeBtn = shapeGrp.add("button", [10, 10, 90, 30], "Set Path");
   var pathName = shapeGrp.add("statictext", [100, 10, 200, 30], "Select a Path.", {
@@ -56,7 +62,7 @@ var spritesToUI = (function(thisObj) {
   );
 
   // OPTIONS
-  var optionsPanel = win.add("panel", [10, 100, 215, 200], "options");
+  var optionsPanel = shapePanel.add("panel", [10, 100, 215, 200], "options");
   optionsPanel.alignment = "column";
   optionsPanel.alignChildren = "left";
   var orientationGrp = optionsPanel.add("group", [5, 5, 285, 55], "undefined");
@@ -79,7 +85,7 @@ var spritesToUI = (function(thisObj) {
   stepBox.value = 0;
   var loopBox = optionsPanel.add("checkbox", [10, 50, 80, 70], "looped");
   loopBox.value = 0;
-  var applyGrp = win.add("group", [0, 5, 240, 305], "undefined");
+  var applyGrp = shapePanel.add("group", [0, 5, 240, 305], "undefined");
   var applyBtn = applyGrp.add("button", [10, 200, 215, 220], "CREATE SPRITES");
 
   shapeBtn.onClick = function() {
@@ -104,8 +110,10 @@ var spritesToUI = (function(thisObj) {
     runSpritesOnPath();
   };
 
+
+
   // EFFECTOR GRP
-  var effectorSetup = win.add("panel", [10, 10, 215, 90], "Effector");
+  var effectorSetup = tabPanel.add("tab", [10, 10, 215, 90], "Effector");
 
   var effectorGrp = effectorSetup.add("group", [0, 0, 300, 100], "undefined");
   effectorGrp.alignment = 'left';
@@ -117,23 +125,58 @@ var spritesToUI = (function(thisObj) {
   var effectorName = effectorGrp.add("statictext", [10, 10, 150, 30], "Select a Shape Layer.", {
     multiline: true
   });
-  var effectorPropertyGrp = effectorSetup.add("group", [0, 0, 300, 100], "undefined");
-  effectorPropertyGrp.alignment = 'left';
-  effectorPropertyGrp.alignChildren = 'left';
-  var addEffectorPropertyBtn = effectorPropertyGrp.add("button", [10, 10, 30, 30], "+");
-  addEffectorPropertyBtn.enabled = false;
-  addEffectorPropertyBtn.onClick = function() {
-    propertyName.text = setPropertyToEffector();
-  };
-  var removePropertyEffectorBtn = effectorPropertyGrp.add("button", [10, 10, 30, 30], "-");
-  removePropertyEffectorBtn.enabled = false;
-  removePropertyEffectorBtn.onClick = function() {
-    alert(this.text);
-  };
-  var propertyName = effectorPropertyGrp.add("statictext", [10, 10, 150, 30], "Add a Property.", {
+  
+  /// EFFECTOR PROPERTY GRP
+  var effectorPropGrpUI =  effectorSetup.add("group", [0, 0, 300, 100], "undefined");
+  effectorPropGrpUI.orientation = 'column';
+  effectorPropGrpUI.alignment = 'left';
+  effectorPropGrpUI.alignchildren = 'left';
+  addEffectorPropertyUI(effectorPropGrpUI);
+
+  function addEffectorPropertyUI(parent){
+    var effectorPropertyGrp = parent.add("group", [0, 0, 300, 100], "undefined");
+    effectorPropertyGrp.alignment = 'left';
+    effectorPropertyGrp.alignChildren = 'left';
+    var addEffectorPropertyBtn = effectorPropertyGrp.add("button", [10, 10, 30, 30], "+");
+    addEffectorPropertyBtn.enabled = false;
+    addEffectorPropertyBtn.onClick = function() {
+      var propMin = parseFloat(this.parent.children[3].text);
+      var propMax = parseFloat(this.parent.children[4].text);
+      alert(propMin + "-" + propMax);
+      this.parent.children[2].text = setPropertyToEffector(propMin,propMax);
+      addEffectorPropertyUI(parent);
+      enablePropertyGrpChildren();
+    };
+    var thisIndex = parent.children.length-1;
+
+    var removePropertyEffectorBtn = effectorPropertyGrp.add("button", [10, 10, 30, 30], "-");
+    removePropertyEffectorBtn.enabled = false;
+    removePropertyEffectorBtn.onClick = function() {
+      var kids = effectorPropGrpUI.children;
+     
+      if(kids.length>1){
+        effectorPropGrpUI.remove(kids[thisIndex]);
+        MASTER.effector.removeEffProperty(thisIndex);
+      }
+     
+      updateUILayout(parent); //Update UI
+    };
+
+    var propertyName = effectorPropertyGrp.add("statictext", [10, 10,100, 30], "Add a Property.", {
     multiline: true
-  });
- 
+    });
+    var minText = effectorPropertyGrp.add("edittext",undefined,"100");
+    var maxText = effectorPropertyGrp.add("edittext",undefined,"100");
+    var applyValuesBtn = effectorPropertyGrp.add("button", [10, 10, 25, 25], ">");
+    
+    applyValuesBtn.onClick = function() {
+      alert(this.text);
+    };
+    parent.alignment = 'left';
+    parent.alignChildren = 'left';
+    updateUILayout(parent); //Update UI
+  }
+
 
   win.onResizing = win.onResize = function() {
     this.layout.resize();
@@ -180,7 +223,7 @@ var spritesToUI = (function(thisObj) {
         } else {
            
           MASTER.path = shapeProps;
-          setEffectorBtn.enabled = true;
+         
           
           return layer.name;
         }
@@ -222,15 +265,6 @@ function setsequentialProperty(){
   radioSequence.value ?  MASTER.isSequential = true :  MASTER.isSequential = false;
 }
 
-function runSpritesOnPath (){
-  setSpriteNumber();
-  setStepProperty();
-  setLoopProperty();
-  setTangentProperty();
-  setsequentialProperty();
-  SpritesOnPath.buildSprites(MASTER);   
-}
-
 function setEffector(){
   var comp = app.project.activeItem;
   if (!(comp instanceof CompItem)) {
@@ -243,24 +277,56 @@ function setEffector(){
     } else { 
       SpritesOnPath.addPathToComment(MASTER.layer,layer);
       var effector = new Effector(layer,MASTER.layer,comp);
+      effector.effectorLayer.scale.expression = "[100,100]";
       MASTER.effector = effector;
-      addEffectorPropertyBtn.enabled = true;
-      removePropertyEffectorBtn.enabled = true;
+     enablePropertyGrpChildren();
       return layer.name; 
     }
   }
 }
 
-function setPropertyToEffector(){
-  var effectorProp =  SpritesOnPath.getSelectedProperties(MASTER.comp.selectedLayers[0])[0];
-  if(effectorProp){
-    return effectorProp.name;
+function enablePropertyGrpChildren(){
+  var kids = effectorPropGrpUI.children;
+  for (var k = 0 ; k< kids.length ; k++){
+   
+    var propGrp = kids[k].children;
+    for(var kk=0 ; kk<propGrp.length; kk++){
+      if(propGrp[kk].type === "button"){
+        propGrp[kk].enabled = true;
+      }
+    }
+   
+  }
+}
+
+function setPropertyToEffector(min,max){
+  var props =  SpritesOnPath.getSelectedProperties(MASTER.comp.selectedLayers[0]);
+
+  var effectorProp = props[props.length-1];
+  if(effectorProp.canSetExpression){
+    var neweffProp = new EffPropertry(effectorProp,min,max);
+    MASTER.effector.properties.push(neweffProp);
+    MASTER.effector.applyPropToSprite(MASTER.spritesLayers,neweffProp);
+    return neweffProp.name;
+
   }else{
     alert("Select a Property on a Sprite Layer.")
     return "Add a Property."
   }
   
 }
+
+function runSpritesOnPath (){
+  setSpriteNumber();
+  setStepProperty();
+  setLoopProperty();
+  setTangentProperty();
+  setsequentialProperty();
+  MASTER.spritesLayers = SpritesOnPath.buildSprites(MASTER);   
+  setEffectorBtn.enabled = true;
+}
+
+
 
 
   //// UTILS
@@ -280,6 +346,7 @@ function setPropertyToEffector(){
 
   return {
     setSprite:setSprite,
-    setPath:setPath
+    setPath:setPath,
+    master: MASTER
 };
 })(this);
