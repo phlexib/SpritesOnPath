@@ -114,7 +114,6 @@ var spritesToUI = (function(thisObj) {
 
   // EFFECTOR GRP
   var effectorSetup = tabPanel.add("tab", [10, 10, 215, 90], "Effector");
-
   var effectorGrp = effectorSetup.add("group", [0, 0, 300, 100], "undefined");
   effectorGrp.alignment = 'left';
   var setEffectorBtn = effectorGrp.add("button", [10, 10, 90, 30], "Set effector");
@@ -142,7 +141,6 @@ var spritesToUI = (function(thisObj) {
     addEffectorPropertyBtn.onClick = function() {
       var propMin = parseFloat(this.parent.children[3].text);
       var propMax = parseFloat(this.parent.children[4].text);
-      alert(propMin + "-" + propMax);
       this.parent.children[2].text = setPropertyToEffector(propMin,propMax);
       addEffectorPropertyUI(parent);
       enablePropertyGrpChildren();
@@ -153,10 +151,9 @@ var spritesToUI = (function(thisObj) {
     removePropertyEffectorBtn.enabled = false;
     removePropertyEffectorBtn.onClick = function() {
       var kids = effectorPropGrpUI.children;
-     
       if(kids.length>1){
         effectorPropGrpUI.remove(kids[thisIndex]);
-        MASTER.effector.removeEffProperty(thisIndex);
+        MASTER.effector.removeEffProperty(thisIndex,MASTER.spritesLayers);
       }
      
       updateUILayout(parent); //Update UI
@@ -170,7 +167,9 @@ var spritesToUI = (function(thisObj) {
     var applyValuesBtn = effectorPropertyGrp.add("button", [10, 10, 25, 25], ">");
     
     applyValuesBtn.onClick = function() {
-      alert(this.text);
+      MASTER.effector.properties[thisIndex].min = minText.text;
+      MASTER.effector.properties[thisIndex].max = maxText.text;
+      MASTER.effector.updateProp(MASTER.spritesLayers, MASTER.effector.properties[thisIndex]);
     };
     parent.alignment = 'left';
     parent.alignChildren = 'left';
@@ -217,15 +216,16 @@ var spritesToUI = (function(thisObj) {
       } else {  
         MASTER.layer = layer;       
         var shapeProps = getSelectedProperties(layer)[1];
-
-        if (shapeProps.matchName != "ADBE Vector Shape") {
+        if(shapeProps){
+          if (shapeProps.matchName != "ADBE Vector Shape") {
+            alert("You can only select a Path Property.");
+          }
+          else {
+            MASTER.path = shapeProps;
+            return layer.name;
+          }
+        }else{
           alert("You can only select a Path Property.");
-        } else {
-           
-          MASTER.path = shapeProps;
-         
-          
-          return layer.name;
         }
       }
     }

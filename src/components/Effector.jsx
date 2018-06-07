@@ -31,23 +31,36 @@ function Effector(effectorLayer,shape,comp) {
   var properties = [];
     
   function applyPropToSprite(propLayers,effProp){
+    properties.push(effProp.matchName);
     var propertyIndex = effProp.index;
     var parentMatchName = effProp.matchName;
     var min = effProp.min;
     var max = effProp.max;
-
-    properties.push(parentMatchName);
-
+    
     for(var pl = 0 ; pl< propLayers.length ; pl++){
       var propLayer = propLayers[pl];
       var propLayer = propLayers[pl];
       var effectsProperty = propLayer.property("ADBE Effect Parade");
       var newProp = effectsProperty.addProperty(parentMatchName);
       newProp.property(propertyIndex).expression = effectorExpression(min,max);
-      newProp.name += " | " + shape.name; 
+      newProp.name += " | " + parentMatchName;
     }
   }
 
+  function updateProp(propLayers , effProp){ 
+    var propertyIndex = effProp.index;
+    var parentMatchName = effProp.matchName;
+    var min = effProp.min;
+    var max = effProp.max;
+    
+    for(var pl = 0 ; pl< propLayers.length ; pl++){
+      var propLayer = propLayers[pl];
+      var propLayer = propLayers[pl];
+      var effectsProperty = propLayer.property("ADBE Effect Parade")(parentMatchName);
+      effectsProperty.property(propertyIndex).expression = effectorExpression(min,max);
+     
+    }
+  }
   function buildPseudoEffect(effName){
     var eff = new XML('<Effect/>');
     eff.@matchName= effName;
@@ -114,13 +127,7 @@ function Effector(effectorLayer,shape,comp) {
       }  
     };
 
-  function createEffector(effectorLayer) {
-    effectorLayer.scale.expression = "[100,100]";
-    var effectsProperty = effectorLayer.property("ADBE Effect Parade");
-    var amountEffect = effectsProperty.addProperty("ADBE Slider Control");
-    amountEffect.name = "EFFECTOR AMOUNT";
-    amountEffect.property("Slider").setValue(0);
-  }
+
 
   function makeShapeBox(effLayer) {
     var rec = effLayer.sourceRectAtTime();
@@ -190,11 +197,14 @@ function effectorExpression (min,max){
   "linear(parseFloat(res),0,box2.width,"+ max + ","+ min +");\n";
   }
 
-  function removeEffProperty(effPropIndex){
+  function removeEffProperty(effPropIndex,propLayers){
+    for(var pl = 0 ; pl< propLayers.length ; pl++){
+      propLayer = propLayers[pl]
+      propLayer.property("ADBE Effect Parade")(properties[effPropIndex].matchName).remove();
+    }
     properties.splice(effPropIndex, 1);
+ 
   }
-
-
 
   this.getPseudoXmlFile = getPseudoXmlFile;
   this.appendPseudoEffectToXml = appendPseudoEffectToXml;
@@ -202,7 +212,8 @@ function effectorExpression (min,max){
   this.properties = properties;
   this.name = name;
   this.applyPropToSprite = applyPropToSprite;   
-  this.removeEffProperty = removeEffProperty
+  this.removeEffProperty = removeEffProperty;
+  this.updateProp = updateProp
 }
 
 // var xml = new Effector();
