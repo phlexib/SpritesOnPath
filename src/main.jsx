@@ -287,22 +287,22 @@ function setEffector(){
 
 function enablePropertyGrpChildren(){
   var kids = effectorPropGrpUI.children;
+  
   for (var k = 0 ; k< kids.length ; k++){
-   
     var propGrp = kids[k].children;
+
     for(var kk=0 ; kk<propGrp.length; kk++){
       if(propGrp[kk].type === "button"){
         propGrp[kk].enabled = true;
       }
     }
-   
   }
 }
 
 function setPropertyToEffector(min,max){
   var props =  SpritesOnPath.getSelectedProperties(MASTER.comp.selectedLayers[0]);
-
   var effectorProp = props[props.length-1];
+
   if(effectorProp.canSetExpression){
     var neweffProp = new EffPropertry(effectorProp,min,max);
     MASTER.effector.properties.push(neweffProp);
@@ -326,10 +326,7 @@ function runSpritesOnPath (){
   setEffectorBtn.enabled = true;
 }
 
-
-
-
-  //// UTILS
+//// UTILS
 
   function getSelectedLayers(targetComp) {
     var targetLayers = targetComp.selectedLayers;
