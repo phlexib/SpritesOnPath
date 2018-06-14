@@ -253,7 +253,7 @@ var spritesToUI = (function(thisObj) {
 }
 
 function checkPathAndSprite(){
-  if((MASTER.path ) && (MASTER.spritesLayers.length >0)){
+  if((MASTER.path ) && (MASTER.spritesLayers.length > 0)){
     return true;
   }else{
     return false;

@@ -26,7 +26,7 @@ function isWindows(){
 
 function executeScript(absFilePath, callback){
   var shellCommand = isWindows() ? ('"C:\\Program Files\\Adobe\\Adobe After Effects CC 2017\\Support Files\\afterfx.exe" -r '+ absFilePath) :
-    ('osascript -e \'tell application "Adobe After Effects CC 2017" to activate\' -e \'tell application "Adobe After Effects CC 2017" to DoScriptFile "'+absFilePath+'"\'');
+    ('osascript -e \'tell application "Adobe After Effects CC 2017" to activate\' -e \'tell application "Adobe After Effects CC 2018" to DoScriptFile "'+absFilePath+'"\'');
   exec(shellCommand,callback);
 }
 
