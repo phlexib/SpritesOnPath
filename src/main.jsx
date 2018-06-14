@@ -87,6 +87,7 @@ var spritesToUI = (function(thisObj) {
   loopBox.value = 0;
   var applyGrp = shapePanel.add("group", [0, 5, 240, 305], "undefined");
   var applyBtn = applyGrp.add("button", [10, 200, 215, 220], "CREATE SPRITES");
+  applyBtn.enabled = false;
 
   shapeBtn.onClick = function() {
     pathName.text = setPath();
@@ -222,6 +223,7 @@ var spritesToUI = (function(thisObj) {
           }
           else {
             MASTER.path = shapeProps;
+            if(checkPathAndSprite){applyBtn.enabled = true}
             return layer.name;
           }
         }else{
@@ -235,6 +237,7 @@ var spritesToUI = (function(thisObj) {
     for (var i = 1; i <= app.project.numItems; i++) {
       if (app.project.item(i).selected) {
           spritesArray.push(app.project.item(i));
+          if(checkPathAndSprite){applyBtn.enabled = true}
       }
     }
     MASTER.sprite = app.project.selection;
@@ -246,6 +249,14 @@ var spritesToUI = (function(thisObj) {
         alert("Number of Sprites is incorrect.");
     }else{
       MASTER.numberOfSprites = spritesNumber;
+  }
+}
+
+function checkPathAndSprite(){
+  if((MASTER.path ) && (MASTER.spritesLayers.length >0)){
+    return true;
+  }else{
+    return false;
   }
 }
 
